@@ -38,10 +38,10 @@ def parse_salary_data(text):
     }
 
     # Improved regex patterns to match salary components
-    basic_match = re.search(r"(Basic|Basic Salary)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
+    basic_match = re.search(r"(Basic|Basic Wage)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
     hra_match = re.search(r"(HRA|House Rent Allowance)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
-    allowances_match = re.search(r"(Allowances|Total Allowances)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
-    deductions_match = re.search(r"(Deductions|Total Deductions)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
+    allowances_match = re.search(r"(Other Allowances|Total Allowances)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
+    deductions_match = re.search(r"(Total Deductions)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
 
     if basic_match:
         salary_data["basic_salary"] = int(basic_match.group(2).replace(",", ""))
