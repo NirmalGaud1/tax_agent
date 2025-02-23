@@ -28,6 +28,32 @@ def extract_text_from_image(image_path):
     extracted_text = " ".join([text[1] for text in result])  # Combine all detected text
     return extracted_text
 
+# Function to clean and parse salary components
+def parse_salary_data(text):
+    salary_data = {
+        "basic_salary": 0,
+        "hra": 0,
+        "allowances": 0,
+        "deductions": 0,
+    }
+
+    # Improved regex patterns to match salary components
+    basic_match = re.search(r"(Basic|Basic Salary)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
+    hra_match = re.search(r"(HRA|House Rent Allowance)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
+    allowances_match = re.search(r"(Allowances|Total Allowances)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
+    deductions_match = re.search(r"(Deductions|Total Deductions)[\s:]*₹?(\d+,?\d*)", text, re.IGNORECASE)
+
+    if basic_match:
+        salary_data["basic_salary"] = int(basic_match.group(2).replace(",", ""))
+    if hra_match:
+        salary_data["hra"] = int(hra_match.group(2).replace(",", ""))
+    if allowances_match:
+        salary_data["allowances"] = int(allowances_match.group(2).replace(",", ""))
+    if deductions_match:
+        salary_data["deductions"] = int(deductions_match.group(2).replace(",", ""))
+
+    return salary_data
+
 # Tax calculation function for the Old Regime (FY 2025-26)
 def calculate_tax_old_regime(income, deductions=0):
     taxable_income = income - deductions
@@ -56,31 +82,6 @@ def calculate_tax_new_regime(income):
         return 200000 + (income - 2000000) * 0.25
     else:
         return 300000 + (income - 2400000) * 0.3
-
-# Function to parse salary components from extracted text
-def parse_salary_data(text):
-    salary_data = {
-        "basic_salary": 0,
-        "hra": 0,
-        "allowances": 0,
-        "deductions": 0,
-    }
-    # Use regex to extract salary components (customize based on your salary slip format)
-    basic_match = re.search(r"Basic Salary[\s:]*₹?(\d+,?\d*)", text)
-    hra_match = re.search(r"HRA[\s:]*₹?(\d+,?\d*)", text)
-    allowances_match = re.search(r"Allowances[\s:]*₹?(\d+,?\d*)", text)
-    deductions_match = re.search(r"Deductions[\s:]*₹?(\d+,?\d*)", text)
-
-    if basic_match:
-        salary_data["basic_salary"] = int(basic_match.group(1).replace(",", ""))
-    if hra_match:
-        salary_data["hra"] = int(hra_match.group(1).replace(",", ""))
-    if allowances_match:
-        salary_data["allowances"] = int(allowances_match.group(1).replace(",", ""))
-    if deductions_match:
-        salary_data["deductions"] = int(deductions_match.group(1).replace(",", ""))
-
-    return salary_data
 
 # Streamlit app
 st.title("Finance AI Agent: Old vs New Tax Regime")
@@ -135,4 +136,3 @@ if uploaded_file:
     response = model.generate_content(input_text)
     st.write("**Explanation:**")
     st.write(response.text)
-
