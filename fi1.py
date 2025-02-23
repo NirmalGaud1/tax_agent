@@ -8,7 +8,7 @@ import streamlit as st
 import google.generativeai as genai
 import easyocr
 import re
-import base64
+import os
 from PIL import Image
 
 # Set up Google Gemini
@@ -16,8 +16,11 @@ API_KEY_GEMINI = "AIzaSyA-9-lTQTWdNM43YdOXMQwGKDy0SrMwo6c"  # Replace with your 
 genai.configure(api_key=API_KEY_GEMINI)
 model = genai.GenerativeModel('gemini-pro')
 
-# Initialize EasyOCR reader
-reader = easyocr.Reader(['en'])  # Use 'en' for English text extraction
+# Create a directory for EasyOCR models
+os.makedirs("easyocr_models", exist_ok=True)
+
+# Initialize EasyOCR with a custom model storage directory
+reader = easyocr.Reader(['en'], model_storage_directory="easyocr_models")
 
 # Function to extract text using EasyOCR
 def extract_text_from_image(image_path):
